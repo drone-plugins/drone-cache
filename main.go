@@ -56,7 +56,7 @@ func main() {
 			// restore
 			err = restore(hash_, mount)
 			if err != nil {
-				fmt.Println("Unable to restore %s. %s\n", mount, err)
+				fmt.Printf("Unable to restore %s. %s\n", mount, err)
 			}
 		}
 
@@ -73,7 +73,7 @@ func main() {
 			// rebuild
 			err := rebuild(hash_, mount)
 			if err != nil {
-				fmt.Println("Unable to rebuild cache for %s. %s\n", mount, err)
+				fmt.Printf("Unable to rebuild cache for %s. %s\n", mount, err)
 			}
 			// purges previously cached files
 			purge(hash_)
