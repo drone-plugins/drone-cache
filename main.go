@@ -42,19 +42,12 @@ func main() {
 	if isRunning(&job) {
 
 		for _, mount := range vargs.Mount {
-			// only restore the cache if the
-			// file actually exists
-			_, err := os.Stat(mount)
-			if err != nil {
-				continue
-			}
-
 			// unique hash for the file
 			hash_ := hash(mount, build.Commit.Branch, job.Environment)
 			fmt.Println("Restoring cache", mount)
 
 			// restore
-			err = restore(hash_, mount)
+			err := restore(hash_, mount)
 			if err != nil {
 				fmt.Printf("Unable to restore %s. %s\n", mount, err)
 			}
@@ -81,16 +74,27 @@ func main() {
 	}
 }
 
-func restore(hash, mount string) error {
+func restore(hash, dir string) error {
 	tar := fmt.Sprintf("%s/cache.%s.tar.gz", CacheDir, hash)
-	cmd := exec.Command("tar", "xf", tar, "-C", mount)
+	_, err := os.Stat(tar)
+	if err != nil {
+		return nil
+	}
+
+	cmd := exec.Command("tar", "-xzf", tar, "-C", "/")
 	return cmd.Run()
 }
 
 // rebuild will rebuild the cache
-func rebuild(hash, mount string) error {
+func rebuild(hash, dir string) (err error) {
+	dir = filepath.Clean(dir)
+	dir, err = filepath.Abs(dir)
+	if err != nil {
+		return err
+	}
+
 	out := fmt.Sprintf("%s/cache.%s.tar.gz", CacheDir, hash)
-	cmd := exec.Command("tar", "cfz", out, mount)
+	cmd := exec.Command("tar", "-czf", out, dir)
 	return cmd.Run()
 }
 
