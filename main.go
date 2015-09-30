@@ -43,7 +43,7 @@ func main() {
 
 		for _, mount := range vargs.Mount {
 			// unique hash for the file
-			hash_ := hash(mount, build.Commit.Branch, job.Environment)
+			hash_ := hash(mount, build.Branch, job.Environment)
 			fmt.Println("Restoring cache", mount)
 
 			// restore
@@ -57,11 +57,11 @@ func main() {
 
 	// if the job is complete and is NOT a pull
 	// request we should re-build the cache.
-	if isSuccess(&job) && !plugin.IsPullRequest(&build) {
+	if isSuccess(&job) && build.Event == plugin.EventPush {
 
 		for _, mount := range vargs.Mount {
 			// unique hash for the file
-			hash_ := hash(mount, build.Commit.Branch, job.Environment)
+			hash_ := hash(mount, build.Branch, job.Environment)
 
 			// rebuild
 			err := rebuild(hash_, mount)
