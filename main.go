@@ -62,6 +62,7 @@ func main() {
 		for _, mount := range vargs.Mount {
 			// unique hash for the file
 			hash_ := hash(mount, build.Branch, job.Environment)
+			fmt.Println("Building cache", mount)
 
 			// rebuild
 			err := rebuild(hash_, mount)
