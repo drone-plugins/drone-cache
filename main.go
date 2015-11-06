@@ -93,6 +93,10 @@ func rebuild(hash, dir string) (err error) {
 	if err != nil {
 		return err
 	}
+	_, err = os.Stat(dir)
+	if err != nil {
+		return fmt.Errorf("File or directory %s does not exist", dir)
+	}
 
 	out := fmt.Sprintf("%s/cache.%s.tar.gz", CacheDir, hash)
 	cmd := exec.Command("tar", "-czf", out, dir)
