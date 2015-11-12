@@ -51,8 +51,14 @@ func main() {
 			if err != nil {
 				fmt.Printf("Unable to restore %s. %s\n", mount, err)
 			}
-		}
 
+			// restore from repository default branch if possible
+			if err != nil && build.Branch != repo.Branch {
+				hash_ = hash(mount, repo.Branch, job.Environment)
+				fmt.Printf("Attempting to restore from %s branch\n", repo.Branch)
+				restore(hash_, mount)
+			}
+		}
 	}
 
 	// if the job is complete and is NOT a pull
