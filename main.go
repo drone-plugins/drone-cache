@@ -91,7 +91,7 @@ func restore(hash, dir string) error {
 	tar := fmt.Sprintf("%s/cache.%s.tar.gz", CacheDir, hash)
 	_, err := os.Stat(tar)
 	if err != nil {
-		return nil
+		return fmt.Errorf("Cache does not exist")
 	}
 
 	cmd := exec.Command("tar", "-xzf", tar, "-C", "/")
