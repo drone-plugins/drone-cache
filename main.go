@@ -57,7 +57,7 @@ func main() {
 
 				// recalulate the hash using the default branch
 				hash_ = hash(mount, repo.Branch, job.Environment)
-				fmt.Printf("Attempting to restore from %s branch\n", repo.Branch)
+				fmt.Printf("Restoring cache from %s branch\n", repo.Branch)
 
 				err = restore(hash_, mount) // second time is the charm
 				if err != nil {
