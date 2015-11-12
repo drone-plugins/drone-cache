@@ -54,9 +54,15 @@ func main() {
 
 			// restore from repository default branch if possible
 			if err != nil && build.Branch != repo.Branch {
+
+				// recalulate the hash using the default branch
 				hash_ = hash(mount, repo.Branch, job.Environment)
 				fmt.Printf("Attempting to restore from %s branch\n", repo.Branch)
-				restore(hash_, mount)
+
+				err = restore(hash_, mount) // second time is the charm
+				if err != nil {
+					fmt.Printf("Unable to restore %s from %s branch.\n", mount, repo.Branch)
+				}
 			}
 		}
 	}
