@@ -9,20 +9,22 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/drone/drone-plugin-go/plugin"
+	"github.com/drone/drone-go/drone"
+	"github.com/drone/drone-go/plugin"
 )
 
 const CacheDir = "/cache"
 
 type Cache struct {
-	Mount []string `json:"mount"`
+	Archive string   `json:"compression"`
+	Mount   []string `json:"mount"`
 }
 
 func main() {
-	workspace := plugin.Workspace{}
-	repo := plugin.Repo{}
-	build := plugin.Build{}
-	job := plugin.Job{}
+	workspace := drone.Workspace{}
+	repo := drone.Repo{}
+	build := drone.Build{}
+	job := drone.Job{}
 	vargs := Cache{}
 
 	plugin.Param("workspace", &workspace)
@@ -47,7 +49,7 @@ func main() {
 			fmt.Println("Restoring cache", mount)
 
 			// restore
-			err := restore(hash_, mount)
+			err := restore(hash_, mount, vargs.Archive)
 			if err != nil {
 				fmt.Printf("Unable to restore %s. %s\n", mount, err)
 			}
@@ -59,7 +61,7 @@ func main() {
 				hash_ = hash(mount, repo.Branch, job.Environment)
 				fmt.Printf("Restoring cache from %s branch\n", repo.Branch)
 
-				err = restore(hash_, mount) // second time is the charm
+				err = restore(hash_, mount, vargs.Archive) // second time is the charm
 				if err != nil {
 					fmt.Printf("Unable to restore %s from %s branch.\n", mount, repo.Branch)
 				}
@@ -69,7 +71,7 @@ func main() {
 
 	// if the job is complete and is NOT a pull
 	// request we should re-build the cache.
-	if isSuccess(&job) && build.Event == plugin.EventPush {
+	if isSuccess(&job) && build.Event == drone.EventPush {
 
 		for _, mount := range vargs.Mount {
 			// unique hash for the file
@@ -77,29 +79,30 @@ func main() {
 			fmt.Println("Building cache", mount)
 
 			// rebuild
-			err := rebuild(hash_, mount)
+			err := rebuild(hash_, mount, vargs.Archive)
 			if err != nil {
 				fmt.Printf("Unable to rebuild cache for %s. %s\n", mount, err)
 			}
 			// purges previously cached files
-			purge(hash_)
+			purge(hash_, vargs.Archive)
 		}
 	}
 }
 
-func restore(hash, dir string) error {
-	tar := fmt.Sprintf("%s/cache.%s.tar.gz", CacheDir, hash)
+func restore(hash, dir, archive string) error {
+	tar := fileName(hash, archive)
 	_, err := os.Stat(tar)
 	if err != nil {
 		return fmt.Errorf("Cache does not exist")
 	}
 
-	cmd := exec.Command("tar", "-xzf", tar, "-C", "/")
+	opt := untarOpts(archive)
+	cmd := exec.Command("tar", opt, tar, "-C", "/")
 	return cmd.Run()
 }
 
 // rebuild will rebuild the cache
-func rebuild(hash, dir string) (err error) {
+func rebuild(hash, dir, archive string) (err error) {
 	dir = filepath.Clean(dir)
 	dir, err = filepath.Abs(dir)
 	if err != nil {
@@ -110,16 +113,17 @@ func rebuild(hash, dir string) (err error) {
 		return fmt.Errorf("File or directory %s does not exist", dir)
 	}
 
-	out := fmt.Sprintf("%s/cache.%s.tar.gz", CacheDir, hash)
-	cmd := exec.Command("tar", "-czf", out, dir)
+	opt := tarOpts(archive)
+	out := fileName(hash, archive)
+	cmd := exec.Command("tar", opt, out, dir)
 	return cmd.Run()
 }
 
 // purge will purge stale data in the cache
 // to avoid a large buildup that could waste
 // disk space on the host machine.
-func purge(hash string) error {
-	files, err := list(hash)
+func purge(hash, archive string) error {
+	files, err := list(hash, archive)
 	if err != nil {
 		return err
 	}
@@ -158,8 +162,8 @@ func hash(mount, branch string, matrix map[string]string) string {
 }
 
 // list returns a list of items in the cache.
-func list(hash string) ([]string, error) {
-	glob := fmt.Sprintf("%s/cache.%s.tar.gz", CacheDir, hash)
+func list(hash, archive string) ([]string, error) {
+	glob := fileName(hash, archive)
 	tars, err := filepath.Glob(glob)
 	if err != nil {
 		return tars, err
@@ -168,11 +172,49 @@ func list(hash string) ([]string, error) {
 	return tars, err
 }
 
-func isRunning(job *plugin.Job) bool {
-	return job.Status == plugin.StatePending ||
-		job.Status == plugin.StateRunning
+func tarOpts(archive string) string {
+	switch archive {
+	case "bzip", "bzip2":
+		return "-cjf"
+	case "gzip":
+		return "-czf"
+	default:
+		return "-cf"
+	}
 }
 
-func isSuccess(job *plugin.Job) bool {
-	return job.Status == plugin.StateSuccess
+func untarOpts(archive string) string {
+	switch archive {
+	case "bzip", "bzip2":
+		return "-xjf"
+	case "gzip":
+		return "-xzf"
+	default:
+		return "-xf"
+	}
+}
+
+func fileName(hash, archive string) string {
+	suffix := fileSuffix(archive)
+	return fmt.Sprintf("%s/cache.%s.%s", CacheDir, hash, suffix)
+}
+
+func fileSuffix(archive string) string {
+	switch archive {
+	case "bzip", "bzip2":
+		return "tar.bz2"
+	case "gzip":
+		return "tar.gz"
+	default:
+		return "tar"
+	}
+}
+
+func isRunning(job *drone.Job) bool {
+	return job.Status == drone.StatusPending ||
+		job.Status == drone.StatusRunning
+}
+
+func isSuccess(job *drone.Job) bool {
+	return job.Status == drone.StatusSuccess
 }
