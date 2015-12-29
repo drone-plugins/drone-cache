@@ -52,6 +52,10 @@ func main() {
 			err := restore(hash_, mount, vargs.Archive)
 			if err != nil {
 				fmt.Printf("Unable to restore %s. %s\n", mount, err)
+
+				// if a cached file is corrupted we should remove it immediately
+				// so that subsequent builds don't try to extract.
+				purge(hash_, vargs.Archive, 0)
 			}
 
 			// restore from repository default branch if possible
@@ -64,6 +68,10 @@ func main() {
 				err = restore(hash_, mount, vargs.Archive) // second time is the charm
 				if err != nil {
 					fmt.Printf("Unable to restore %s from %s branch.\n", mount, repo.Branch)
+
+					// if a cached file is corrupted we should remove it immediately
+					// so that subsequent builds don't try to extract.
+					purge(hash_, vargs.Archive, 0)
 				}
 			}
 		}
@@ -84,7 +92,7 @@ func main() {
 				fmt.Printf("Unable to rebuild cache for %s. %s\n", mount, err)
 			}
 			// purges previously cached files
-			purge(hash_, vargs.Archive)
+			purge(hash_, vargs.Archive, 1)
 		}
 	}
 }
@@ -119,18 +127,15 @@ func rebuild(hash, dir, archive string) (err error) {
 	return cmd.Run()
 }
 
-// purge will purge stale data in the cache
-// to avoid a large buildup that could waste
-// disk space on the host machine.
-func purge(hash, archive string) error {
+// purge will purge stale data in the cache to avoid a large
+// buildup that could waste disk space on the host machine.
+func purge(hash, archive string, keep int) error {
 	files, err := list(hash, archive)
 	if err != nil {
 		return err
 	}
 
-	// we should only keep the latest
-	// file in the cache
-	for i := 1; i < len(files); i++ {
+	for i := keep; i < len(files); i++ {
 		err = os.Remove(files[i])
 		if err != nil {
 			return err
