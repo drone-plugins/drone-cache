@@ -140,8 +140,8 @@ func hash(mount, branch string, matrix map[string]string) string {
 
 	// concatinate all matrix values
 	// with the branch
-	for val := range matrix {
-		parts = append(parts, val)
+	for key, val := range matrix {
+		parts = append(parts, key+"="+val)
 	}
 
 	// sort the strings to ensure ordering
