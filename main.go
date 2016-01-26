@@ -20,7 +20,13 @@ type Cache struct {
 	Mount   []string `json:"mount"`
 }
 
+var (
+	buildDate string
+)
+
 func main() {
+	fmt.Printf("Drone Cache Plugin built at %s\n", buildDate)
+
 	workspace := drone.Workspace{}
 	repo := drone.Repo{}
 	build := drone.Build{}
