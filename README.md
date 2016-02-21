@@ -4,7 +4,7 @@
 [![Coverage Status](https://aircover.co/badges/drone-plugins/drone-cache/coverage.svg)](https://aircover.co/drone-plugins/drone-cache)
 [![](https://badge.imagelayers.io/plugins/drone-cache:latest.svg)](https://imagelayers.io/?images=plugins/drone-cache:latest 'Get your own badge on imagelayers.io')
 
-Drone plugin to simply cache the build workspace
+Drone plugin to simply cache the build workspace. For the usage information and a listing of the available options please take a look at [the docs](DOCS.md).
 
 ## Binary
 
