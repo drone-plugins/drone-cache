@@ -1,38 +1,148 @@
-build:
-  image: golang:1.5
-  environment:
-    - CGO_ENABLED=0
-  commands:
-    - make deps
-    - make vet
-    - make build
-    - make test
+workspace:
+  base: /go
+  path: src/github.com/drone-plugins/drone-cache
 
-publish:
-  coverage:
-    when:
-      branch: master
-  docker:
-    username: $$DOCKER_USER
-    password: $$DOCKER_PASS
-    email: $$DOCKER_EMAIL
-    repo: plugins/drone-cache
-    tag: latest
-    when:
-      branch: master
-  docker:
-    username: $$DOCKER_USER
-    password: $$DOCKER_PASS
-    email: $$DOCKER_EMAIL
-    repo: plugins/drone-cache
-    tag: develop
-    when:
-      branch: develop
+pipeline:
+  deps:
+    image: golang:1.10
+    pull: true
+    commands:
+      - go get -u github.com/golang/dep/cmd/dep
+      - dep ensure
 
-plugin:
-  name: Cache
-  desc: Simple cache method for the build workspace
-  type: cache
-  image: plugins/drone-cache
-  labels:
-    - cache
+  test:
+    image: golang:1.10
+    pull: true
+    commands:
+      - go vet ./...
+      - go test -cover ./...
+
+  build_linux_amd64:
+    image: golang:1.10
+    pull: true
+    group: build
+    environment:
+      - GOOS=linux
+      - GOARCH=amd64
+      - CGO_ENABLED=0
+    commands:
+      - |
+        if test "${DRONE_TAG}" = ""; then
+          go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-cache
+        else
+          go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/drone-cache
+        fi
+
+  build_linux_i386:
+    image: golang:1.10
+    pull: true
+    group: build
+    environment:
+      - GOOS=linux
+      - GOARCH=386
+      - CGO_ENABLED=0
+    commands:
+      - |
+        if test "${DRONE_TAG}" = ""; then
+          go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/i386/drone-cache
+        else
+          go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/i386/drone-cache
+        fi
+
+  build_linux_arm64:
+    image: golang:1.10
+    pull: true
+    group: build
+    environment:
+      - GOOS=linux
+      - GOARCH=arm64
+      - CGO_ENABLED=0
+    commands:
+      - |
+        if test "${DRONE_TAG}" = ""; then
+          go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-cache
+        else
+          go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm64/drone-cache
+        fi
+
+  build_linux_arm:
+    image: golang:1.10
+    pull: true
+    group: build
+    environment:
+      - GOOS=linux
+      - GOARCH=arm
+      - CGO_ENABLED=0
+      - GOARM=7
+    commands:
+      - |
+        if test "${DRONE_TAG}" = ""; then
+          go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm/drone-cache
+        else
+          go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm/drone-cache
+        fi
+
+  # publish_linux_amd64:
+  #   image: plugins/docker:17.12
+  #   pull: true
+  #   secrets: [ docker_username, docker_password ]
+  #   group: docker
+  #   repo: plugins/cache
+  #   auto_tag: true
+  #   auto_tag_suffix: linux-amd64
+  #   dockerfile: Dockerfile
+  #   when:
+  #     event: [ push, tag ]
+
+  # publish_linux_i386:
+  #   image: plugins/docker:17.12
+  #   pull: true
+  #   secrets: [ docker_username, docker_password ]
+  #   group: docker
+  #   repo: plugins/cache
+  #   auto_tag: true
+  #   auto_tag_suffix: linux-i386
+  #   dockerfile: Dockerfile.i386
+  #   when:
+  #     event: [ push, tag ]
+
+  # publish_linux_arm64:
+  #   image: plugins/docker:17.12
+  #   pull: true
+  #   secrets: [ docker_username, docker_password ]
+  #   group: docker
+  #   repo: plugins/cache
+  #   auto_tag: true
+  #   auto_tag_suffix: linux-arm64
+  #   dockerfile: Dockerfile.arm64
+  #   when:
+  #     event: [ push, tag ]
+
+  # publish_linux_arm:
+  #   image: plugins/docker:17.12
+  #   pull: true
+  #   secrets: [ docker_username, docker_password ]
+  #   group: docker
+  #   repo: plugins/cache
+  #   auto_tag: true
+  #   auto_tag_suffix: linux-arm
+  #   dockerfile: Dockerfile.arm
+  #   when:
+  #     event: [ push, tag ]
+
+  # manifests:
+  #   image: plugins/manifest:1
+  #   pull: true
+  #   secrets: [ docker_username, docker_password ]
+  #   spec: manifest.tmpl
+  #   auto_tag: true
+  #   ignore_missing: true
+  #   when:
+  #     event: [ push, tag ]
+
+  # microbadger:
+  #   image: plugins/webhook:1
+  #   pull: true
+  #   secrets: [ webhook_url ]
+  #   when:
+  #     status: [ success ]
