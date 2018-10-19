@@ -34,35 +34,35 @@ build_script:
       docker pull microsoft/nanoserver:10.0.14393.1593
       docker build -f Dockerfile.windows -t plugins/cache:windows-amd64 .
 
-test_script:
-  - ps: |
-      docker run --rm plugins/cache:windows-amd64 --version
+# test_script:
+#   - ps: |
+#       docker run --rm plugins/cache:windows-amd64 --version
 
-deploy_script:
-  - ps: |
-      $ErrorActionPreference = 'Stop';
+# deploy_script:
+#   - ps: |
+#       $ErrorActionPreference = 'Stop';
 
-      if ( $env:APPVEYOR_PULL_REQUEST_NUMBER ) {
-        Write-Host Nothing to deploy.
-      } else {
-        echo $env:DOCKER_PASSWORD | docker login --username $env:DOCKER_USERNAME --password-stdin
+#       if ( $env:APPVEYOR_PULL_REQUEST_NUMBER ) {
+#         Write-Host Nothing to deploy.
+#       } else {
+#         echo $env:DOCKER_PASSWORD | docker login --username $env:DOCKER_USERNAME --password-stdin
 
-        if ( $env:APPVEYOR_REPO_TAG -eq 'true' ) {
-          $major,$minor,$patch = $env:APPVEYOR_REPO_TAG_NAME.substring(1).split('.')
+#         if ( $env:APPVEYOR_REPO_TAG -eq 'true' ) {
+#           $major,$minor,$patch = $env:APPVEYOR_REPO_TAG_NAME.substring(1).split('.')
 
-          docker push plugins/cache:windows-amd64
+#           docker push plugins/cache:windows-amd64
 
-          docker tag plugins/cache:windows-amd64 plugins/cache:$major.$minor.$patch-windows-amd64
-          docker push plugins/cache:$major.$minor.$patch-windows-amd64
+#           docker tag plugins/cache:windows-amd64 plugins/cache:$major.$minor.$patch-windows-amd64
+#           docker push plugins/cache:$major.$minor.$patch-windows-amd64
 
-          docker tag plugins/cache:windows-amd64 plugins/cache:$major.$minor-windows-amd64
-          docker push plugins/cache:$major.$minor-windows-amd64
+#           docker tag plugins/cache:windows-amd64 plugins/cache:$major.$minor-windows-amd64
+#           docker push plugins/cache:$major.$minor-windows-amd64
 
-          docker tag plugins/cache:windows-amd64 plugins/cache:$major-windows-amd64
-          docker push plugins/cache:$major-windows-amd64
-        } else {
-          if ( $env:APPVEYOR_REPO_BRANCH -eq 'master' ) {
-            docker push plugins/cache:windows-amd64
-          }
-        }
-      }
+#           docker tag plugins/cache:windows-amd64 plugins/cache:$major-windows-amd64
+#           docker push plugins/cache:$major-windows-amd64
+#         } else {
+#           if ( $env:APPVEYOR_REPO_BRANCH -eq 'master' ) {
+#             docker push plugins/cache:windows-amd64
+#           }
+#         }
+#       }

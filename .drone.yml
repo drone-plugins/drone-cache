@@ -82,67 +82,67 @@ pipeline:
           go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/arm/drone-cache
         fi
 
-  publish_linux_amd64:
-    image: plugins/docker:17.12
-    pull: true
-    secrets: [ docker_username, docker_password ]
-    group: docker
-    repo: plugins/cache
-    auto_tag: true
-    auto_tag_suffix: linux-amd64
-    dockerfile: Dockerfile
-    when:
-      event: [ push, tag ]
+  # publish_linux_amd64:
+  #   image: plugins/docker:17.12
+  #   pull: true
+  #   secrets: [ docker_username, docker_password ]
+  #   group: docker
+  #   repo: plugins/cache
+  #   auto_tag: true
+  #   auto_tag_suffix: linux-amd64
+  #   dockerfile: Dockerfile
+  #   when:
+  #     event: [ push, tag ]
 
-  publish_linux_i386:
-    image: plugins/docker:17.12
-    pull: true
-    secrets: [ docker_username, docker_password ]
-    group: docker
-    repo: plugins/cache
-    auto_tag: true
-    auto_tag_suffix: linux-i386
-    dockerfile: Dockerfile.i386
-    when:
-      event: [ push, tag ]
+  # publish_linux_i386:
+  #   image: plugins/docker:17.12
+  #   pull: true
+  #   secrets: [ docker_username, docker_password ]
+  #   group: docker
+  #   repo: plugins/cache
+  #   auto_tag: true
+  #   auto_tag_suffix: linux-i386
+  #   dockerfile: Dockerfile.i386
+  #   when:
+  #     event: [ push, tag ]
 
-  publish_linux_arm64:
-    image: plugins/docker:17.12
-    pull: true
-    secrets: [ docker_username, docker_password ]
-    group: docker
-    repo: plugins/cache
-    auto_tag: true
-    auto_tag_suffix: linux-arm64
-    dockerfile: Dockerfile.arm64
-    when:
-      event: [ push, tag ]
+  # publish_linux_arm64:
+  #   image: plugins/docker:17.12
+  #   pull: true
+  #   secrets: [ docker_username, docker_password ]
+  #   group: docker
+  #   repo: plugins/cache
+  #   auto_tag: true
+  #   auto_tag_suffix: linux-arm64
+  #   dockerfile: Dockerfile.arm64
+  #   when:
+  #     event: [ push, tag ]
 
-  publish_linux_arm:
-    image: plugins/docker:17.12
-    pull: true
-    secrets: [ docker_username, docker_password ]
-    group: docker
-    repo: plugins/cache
-    auto_tag: true
-    auto_tag_suffix: linux-arm
-    dockerfile: Dockerfile.arm
-    when:
-      event: [ push, tag ]
+  # publish_linux_arm:
+  #   image: plugins/docker:17.12
+  #   pull: true
+  #   secrets: [ docker_username, docker_password ]
+  #   group: docker
+  #   repo: plugins/cache
+  #   auto_tag: true
+  #   auto_tag_suffix: linux-arm
+  #   dockerfile: Dockerfile.arm
+  #   when:
+  #     event: [ push, tag ]
 
-  manifests:
-    image: plugins/manifest:1
-    pull: true
-    secrets: [ docker_username, docker_password ]
-    spec: manifest.tmpl
-    auto_tag: true
-    ignore_missing: true
-    when:
-      event: [ push, tag ]
+  # manifests:
+  #   image: plugins/manifest:1
+  #   pull: true
+  #   secrets: [ docker_username, docker_password ]
+  #   spec: manifest.tmpl
+  #   auto_tag: true
+  #   ignore_missing: true
+  #   when:
+  #     event: [ push, tag ]
 
-  microbadger:
-    image: plugins/webhook:1
-    pull: true
-    secrets: [ webhook_url ]
-    when:
-      status: [ success ]
+  # microbadger:
+  #   image: plugins/webhook:1
+  #   pull: true
+  #   secrets: [ webhook_url ]
+  #   when:
+  #     status: [ success ]
