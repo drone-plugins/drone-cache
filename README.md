@@ -7,7 +7,6 @@
 [![](https://images.microbadger.com/badges/image/plugins/cache.svg)](https://microbadger.com/images/plugins/cache "Get your own image badge on microbadger.com")
 [![Go Doc](https://godoc.org/github.com/drone-plugins/drone-cache?status.svg)](http://godoc.org/github.com/drone-plugins/drone-cache)
 [![Go Report](https://goreportcard.com/badge/github.com/drone-plugins/drone-cache)](https://goreportcard.com/report/github.com/drone-plugins/drone-cache)
-[![](https://images.microbadger.com/badges/image/plugins/cache.svg)](https://microbadger.com/images/plugins/cache "Get your own image badge on microbadger.com")
 
 Drone plugin to simply cache the build workspace. For the usage information and a listing of the available options please take a look at [the docs](DOCS.md).
 
