@@ -1,8 +1,12 @@
 # drone-cache
 
-[![Build Status](http://beta.drone.io/api/badges/drone-plugins/drone-cache/status.svg)](http://beta.drone.io/drone-plugins/drone-cache)
-[![Coverage Status](https://aircover.co/badges/drone-plugins/drone-cache/coverage.svg)](https://aircover.co/drone-plugins/drone-cache)
-[![](https://badge.imagelayers.io/plugins/drone-cache:latest.svg)](https://imagelayers.io/?images=plugins/drone-cache:latest 'Get your own badge on imagelayers.io')
+[![Build Status](http://cloud.drone.io/api/badges/drone-plugins/drone-cache/status.svg)](http://cloud.drone.io/drone-plugins/drone-cache)
+[![Gitter chat](https://badges.gitter.im/drone/drone.png)](https://gitter.im/drone/drone)
+[![Join the discussion at https://discourse.drone.io](https://img.shields.io/badge/discourse-forum-orange.svg)](https://discourse.drone.io)
+[![Drone questions at https://stackoverflow.com](https://img.shields.io/badge/drone-stackoverflow-orange.svg)](https://stackoverflow.com/questions/tagged/drone.io)
+[![](https://images.microbadger.com/badges/image/plugins/cache.svg)](https://microbadger.com/images/plugins/cache "Get your own image badge on microbadger.com")
+[![Go Doc](https://godoc.org/github.com/drone-plugins/drone-cache?status.svg)](http://godoc.org/github.com/drone-plugins/drone-cache)
+[![Go Report](https://goreportcard.com/badge/github.com/drone-plugins/drone-cache)](https://goreportcard.com/report/github.com/drone-plugins/drone-cache)
 
 Drone plugin to simply cache the build workspace. For the usage information and a listing of the available options please take a look at [the docs](DOCS.md).
 
