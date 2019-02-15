@@ -1,10 +1,10 @@
 # escape=`
-FROM plugins/base:windows-amd64
+FROM plugins/base:windows-1803
 
 LABEL maintainer="Drone.IO Community <drone-dev@googlegroups.com>" `
   org.label-schema.name="Drone Cache" `
   org.label-schema.vendor="Drone.IO Community" `
   org.label-schema.schema-version="1.0"
 
-ADD release\drone-cache.exe c:\drone-cache.exe
-ENTRYPOINT [ "c:\\drone-cache.exe" ]
+ADD release/windows/amd64/drone-cache.exe C:/bin/drone-cache.exe
+ENTRYPOINT [ "C:\\bin\\drone-cache.exe" ]
